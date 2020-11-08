@@ -89,6 +89,18 @@ const employeeTemplate = {
 };
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+async function addConfirmation(){
+    let answer = await inquirer.prompt([
+        {
+            type: "confirm",
+            name: "confirmation",
+            message: "Add another employee?"
+        }
+    ]);
+
+    return answer.confirmation;
+}
+
 async function askQuestions(questions){
     let answers = [];
     for(let i=0; i<questions.length; i++){
@@ -162,18 +174,6 @@ async function getEmployeeInfo(employeeType){
     return info;   
 }
 
-async function addConfirmation(){
-    let answer = await inquirer.prompt([
-        {
-            type: "confirm",
-            name: "confirmation",
-            message: "Add another employee?"
-        }
-    ]);
-
-    return answer.confirmation;
-}
-
 function createEmployee(employeeType){
     switch(employeeType){
         case "engineer":
@@ -185,9 +185,36 @@ function createEmployee(employeeType){
     }
 }
 
+function writeFile(directory, filename, data){
+    if(fs.existsSync(directory)){
+        fs.writeFile(filename, data, function(err){
+            if(err){
+                console.log("Error: " + err);
+            }else{
+                console.log("File has been saved.");
+            }
+        });
+        return;
+    }else{
+        fs.mkdir(directory, (err) => {
+            if(err){
+                console.log(err);
+            }
+        });
+        fs.writeFile(outputPath, data, (err) => {
+            if(err){
+                console.log(err);
+            }
+        });
+    }
+    return;
+}
+
 async function init(){
     let employees = await getEmployees();
-    console.log(employees);
+    let html = render(employees);
+    
+    writeFile(OUTPUT_DIR, outputPath, html);
 }
 
 
